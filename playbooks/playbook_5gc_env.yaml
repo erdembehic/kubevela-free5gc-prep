@@ -1,0 +1,86 @@
+---
+- name: Setup Free5GC Environment
+  hosts: all
+  become: true
+  tasks:
+    - name: Create /root/kubedata directory
+      ansible.builtin.file:
+        path: /root/kubedata
+        state: directory
+        mode: '0755'
+
+    - name: Create /root/5gc directory
+      ansible.builtin.file:
+        path: /root/5gc
+        state: directory
+        mode: '0755'
+
+    - name: Add Helm repo for towards5gs
+      ansible.builtin.command:
+        argv:
+          - helm
+          - repo
+          - add
+          - towards5gs
+          - https://raw.githubusercontent.com/Orange-OpenSource/towards5gs-helm/main/repo/
+      become: false
+      register: helm_repo_add
+
+    - name: Update Helm repositories
+      ansible.builtin.command:
+        argv:
+          - helm
+          - repo
+          - update
+      become: false
+      register: helm_repo_update
+
+    - name: Display Helm repo update output
+      ansible.builtin.debug:
+        var: helm_repo_update.stdout
+
+
+    - name: Pull Free5GC Helm chart
+      ansible.builtin.command:
+        argv:
+          - helm
+          - pull
+          - towards5gs/free5gc
+        chdir: /root/5gc
+
+    - name: Pull Free5GC Helm chart
+      ansible.builtin.command:
+        argv:
+          - helm
+          - pull
+          - towards5gs/ueransim
+        chdir: /root/5gc
+
+    - name: Create PersistentVolume YAML file
+      ansible.builtin.copy:
+        dest: /root/5gc/pv.yaml
+        content: |
+          apiVersion: v1
+          kind: PersistentVolume
+          metadata:
+            name: example-local-pv9
+            labels:
+              project: free5gc
+          spec:
+            capacity:
+              storage: 8Gi
+            accessModes:
+            - ReadWriteOnce
+            persistentVolumeReclaimPolicy: Retain
+            local:
+              path: /root/kubedata
+            nodeAffinity:
+              required:
+                nodeSelectorTerms:
+                - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                    - onap-k8s-worker-2
+        mode: '0644'
+

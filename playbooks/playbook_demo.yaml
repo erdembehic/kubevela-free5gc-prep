@@ -1,0 +1,20 @@
+---
+- name: Setup cri-dockerd
+  hosts: all
+  become: true
+  tasks:
+    - name: Get the latest version of cri-dockerd using uri
+      ansible.builtin.uri:
+        url: https://api.github.com/repos/Mirantis/cri-dockerd/releases/latest
+        return_content: true
+      register: github_response
+
+    - name: Extract the tag_name
+      ansible.builtin.set_fact:
+        ver: "{{ github_response.json.tag_name | regex_replace('^v', '') }}"
+
+    - name: Download cri-dockerd tarball
+      ansible.builtin.get_url:
+        url: "https://github.com/Mirantis/cri-dockerd/releases/download/v{{ ver }}/cri-dockerd-{{ ver }}.amd64.tgz"
+        dest: "/home/ubuntu/free5gc/ansible/cri-dockerd-{{ ver }}.amd64.tgz"
+        mode: '0644'

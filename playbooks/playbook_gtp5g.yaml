@@ -1,0 +1,50 @@
+---
+- name: Clone and install gtp5g
+  hosts: all
+  become: true
+  tasks:
+    - name: Ensure git is installed
+      ansible.builtin.package:
+        name: git
+        state: present
+
+    - name: Clone the gtp5g repository
+      ansible.builtin.git:
+        repo: https://github.com/free5gc/gtp5g.git
+        dest: /home/ubuntu/free5gc/gtp5g
+        update: false
+        force: true
+
+    - name: Compile gtp5g using make
+      ansible.builtin.command:
+        cmd: make
+        chdir: /home/ubuntu/free5gc/gtp5g
+        creates: /home/ubuntu/free5gc/gtp5g/your_output_file
+      become: true
+      register: make_output
+
+    - name: Install gtp5g using make install
+      ansible.builtin.command:
+        cmd: make install
+        chdir: /home/ubuntu/free5gc/gtp5g
+      become: true
+      register: make_install_output
+
+    - name: Display make install output
+      ansible.builtin.debug:
+        var: make_install_output.stdout
+
+
+    - name: Display make output
+      ansible.builtin.debug:
+        var: make_output.stdout
+
+    - name: Display make install output
+      ansible.builtin.debug:
+        var: make_install_output.stdout
+
+
+# git clone https://github.com/free5gc/gtp5g.git
+# cd gtp5g
+# make
+# make install
