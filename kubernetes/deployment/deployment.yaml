@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: job-trigger-deployment
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: job-trigger
+  template:
+    metadata:
+      labels:
+        app: job-trigger
+    spec:
+      initContainers: # PV'nin mevcut olup olmadığını kontrol eden init-container
+      - name: pv-checker
+        image: busybox
+        command:
+          - "/bin/sh"
+          - "-c"
+          - |
+            while [ ! -d /root/kubedata ]; do
+              echo "Waiting for PersistentVolume to be ready...";
+              sleep 5;
+            done;
+            echo "PersistentVolume is ready.";
+        volumeMounts:
+        - name: data-volume
+          mountPath: /root/kubedata
+      containers:
+      - name: job-creator
+        image: bitnami/kubectl:latest
+        command:
+          - "/bin/sh"
+        args:
+          - "-c"
+          - |
+            echo "Creating Job...";
+            kubectl apply -f /etc/config/job.yaml;
+            echo "Job created.";
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/config
+      volumes:
+      - name: data-volume
+        hostPath:
+          path: /root/kubedata
+          type: Directory
+      - name: config-volume
+        configMap:
+          name: job-config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: job-config
+  namespace: default
+data:
+  job.yaml: |
+    apiVersion: batch/v1
+    kind: Job
+    metadata:
+      name: free5gc-prep-job
+      namespace: default
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          containers:
+          - name: ansible-job
+            image: 192.168.230.50:51002/free5gc-prep:1.0.0
+            command: ["/bin/bash", "-c", "echo 'Job is running'; sleep 10"]
+          restartPolicy: Never
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: example-local-pv9
+  labels:
+    project: free5gc
+spec:
+  capacity:
+    storage: 8Gi
+  accessModes:
+  - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  local:
+    path: /root/kubedata
