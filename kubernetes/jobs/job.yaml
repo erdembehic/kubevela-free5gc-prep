@@ -4,7 +4,7 @@ metadata:
   name: free5gc-prep-job
   namespace: default
 spec:
-  backoffLimit: 0
+  backoffLimit: 2
   template:
     spec:
       containers:
