@@ -9,6 +9,6 @@ spec:
     spec:
       containers:
       - name: ansible-job
-        image: 192.168.142.4:12360/repository/argela-docker-local/free5gc-prep:1.0.0
+        image: 192.168.230.50/free5gc-prep:1.0.0
         command: ["/bin/bash", "-c", "echo 'Job is running'; sleep 10"]
       restartPolicy: Never
