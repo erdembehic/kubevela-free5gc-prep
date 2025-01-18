@@ -84,3 +84,9 @@
                     - onap-k8s-worker-2
         mode: '0644'
 
+    - name: Install Multus CNI using kubectl
+      ansible.builtin.command:
+        cmd: kubectl apply -f https://raw.githubusercontent.com/k8snetworkplumbingwg/multus-cni/master/deployments/multus-daemonset.yml
+      register: result
+      changed_when: "'configured' in result.stdout"
+
