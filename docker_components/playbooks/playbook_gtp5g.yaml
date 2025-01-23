@@ -1,6 +1,8 @@
 ---
 - name: Clone and install gtp5g
   hosts: all
+  vars:
+    ansible_become_pass: 1
   become: true
   tasks:
     - name: Ensure git is installed
@@ -8,25 +10,39 @@
         name: git
         state: present
 
+    - name: Check if gtp5g repository already exists
+      ansible.builtin.stat:
+        path: /home/argela/free5gc/gtp5g/.git
+      register: gtp5g_repo
+
+    - name: Create the /home/argela/free5gc directory
+      ansible.builtin.file:
+        path: /home/argela/free5gc/gtp5g
+        state: directory
+        mode: '0755'
+
     - name: Clone the gtp5g repository
       ansible.builtin.git:
         repo: https://github.com/free5gc/gtp5g.git
-        dest: /home/ubuntu/free5gc/gtp5g
-        update: false
-        force: true
+        dest: /home/argela/free5gc/gtp5g
+        update: true
+        force: false
+      when: not gtp5g_repo.stat.exists
+      register: clone_result
 
     - name: Compile gtp5g using make
       ansible.builtin.command:
         cmd: make
-        chdir: /home/ubuntu/free5gc/gtp5g
-        creates: /home/ubuntu/free5gc/gtp5g/your_output_file
+        chdir: /home/argela/free5gc/gtp5g
+        creates: /home/argela/free5gc/gtp5g/your_output_file
       become: true
       register: make_output
 
     - name: Install gtp5g using make install
       ansible.builtin.command:
         cmd: make install
-        chdir: /home/ubuntu/free5gc/gtp5g
+        chdir: /home/argela/free5gc/gtp5g
+        creates: /usr/local/bin/gtp5g
       become: true
       register: make_install_output
 

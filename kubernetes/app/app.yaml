@@ -32,6 +32,6 @@ spec:
     spec:
       containers:
       - name: ansible-job
-        image: 192.168.230.50:51002/free5gc-prep:1.0.0
+        image: 192.168.230.50:51002/repository/docker-argela/free5gc-prep:u-argela
         command: ["/bin/bash", "-c", "/playbooks/run_playbooks.sh ; sleep 10"]
       restartPolicy: Never

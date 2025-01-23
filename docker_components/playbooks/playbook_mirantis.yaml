@@ -1,6 +1,8 @@
 ---
 - name: Setup cri-dockerd
   hosts: all
+  vars:
+    ansible_become_pass: 1
   become: true
   tasks:
     - name: Get the latest version of cri-dockerd using uri
@@ -13,21 +15,29 @@
       ansible.builtin.set_fact:
         ver: "{{ github_response.json.tag_name | regex_replace('^v', '') }}"
 
+    - name: Ensure the destination directory exists
+      ansible.builtin.file:
+        path: /home/argela/free5gc/ansible/
+        state: directory
+        mode: '0755'
+
     - name: Download cri-dockerd tarball
       ansible.builtin.get_url:
         url: "https://github.com/Mirantis/cri-dockerd/releases/download/v{{ ver }}/cri-dockerd-{{ ver }}.amd64.tgz"
-        dest: "/home/ubuntu/free5gc/ansible/cri-dockerd-{{ ver }}.amd64.tgz"
+        dest: "/home/argela/free5gc/ansible/cri-dockerd-{{ ver }}.amd64.tgz"
         mode: '0644'
 
     - name: Extract cri-dockerd tarball
       ansible.builtin.unarchive:
-        src: "/home/ubuntu/free5gc/ansible/cri-dockerd-{{ ver }}.amd64.tgz"
-        dest: "/home/ubuntu/free5gc/ansible/cri-dockerd"
+        src: "/home/argela/free5gc/ansible/cri-dockerd-{{ ver }}.amd64.tgz"
+        creates: "home/argela/free5gc/ansible"
+        dest: "/home/argela/free5gc/ansible/cri-dockerd"
         remote_src: true
+        force: true
 
     - name: Move cri-dockerd binary to /usr/local/bin
       ansible.builtin.file:
-        src: /home/ubuntu/free5gc/ansible/cri-dockerd
+        src: /home/argela/free5gc/ansible/cri-dockerd
         dest: /usr/local/bin/cri-dockerd
         state: link
 
