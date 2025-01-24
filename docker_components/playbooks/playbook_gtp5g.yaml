@@ -56,7 +56,7 @@
 
     - name: Install gtp5g using make install
       ansible.builtin.command:
-        cmd: make uninstall
+        cmd: make install
         chdir: /home/argela/free5gc/gtp5g
         creates: /usr/local/bin/gtp5g
       become: true
