@@ -23,3 +23,4 @@
       register: result
       changed_when: "'configured' in result.stdout"
 
+#TODO İPVALN MACVLAN STATICLERİ OPT YE EKLE
