@@ -1,0 +1,69 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: free5gc-upf
+spec:
+  destination:
+    name: ''
+    namespace: default
+    server: https://kubernetes.default.svc
+  source:
+    path: helm/free5gc/charts/free5gc-upf
+    repoURL: http://repo.nfvlab.argela.com.tr:12001/behic.erdem/free5gc-auto.git
+    targetRevision: HEAD
+    helm:
+      parameters:
+        - name: global.n3network.masterIf
+          value: ens33
+        - name: global.n4network.masterIf
+          value: ens33
+        - name: global.n6network.masterIf
+          value: ens33
+        - name: global.n6network.subnetIP
+          value: 10.100.60.0
+        - name: global.n6network.gatewayIP
+          value: 10.100.60.2
+        - name: upf.n6if.ipAddress
+          value: 10.100.60.112
+  sources: []
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+
+
+
+
+
+---- free5gc
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: free5gc
+spec:
+  destination:
+    name: ''
+    namespace: default
+    server: https://kubernetes.default.svc
+  source:
+    path: helm/free5gc
+    repoURL: http://repo.nfvlab.argela.com.tr:12001/behic.erdem/free5gc-auto.git
+    targetRevision: HEAD
+    helm:
+      parameters:
+        - name: global.n2network.masterIf
+          value: ens18
+        - name: global.n3network.masterIf
+          value: ens18
+        - name: global.n4network.masterIf
+          value: ens18
+        - name: global.n6network.masterIf
+          value: ens18
+        - name: global.n9network.masterIf
+          value: ens18
+  sources: []
+  project: default
+  syncPolicy:
+    automated: null
