@@ -8,15 +8,16 @@ spec:
   capacity:
     storage: 8Gi
   accessModes:
-  - ReadWriteOnce
+    - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
+  volumeMode: Filesystem
   local:
     path: /root/kubedata
   nodeAffinity:
     required:
       nodeSelectorTerms:
-      - matchExpressions:
-        - key: kubernetes.io/hostname
-          operator: In
-          values:
-          - cldauto-worker01
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - cldauto-worker01  # Ensure this matches the exact node name from `kubectl get nodes`
