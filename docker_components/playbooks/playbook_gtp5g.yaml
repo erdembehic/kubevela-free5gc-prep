@@ -44,8 +44,6 @@
         update: true
         force: true
 
-
-
     - name: Compile gtp5g using make
       ansible.builtin.command:
         cmd: make
