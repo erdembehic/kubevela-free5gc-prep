@@ -5,7 +5,7 @@ metadata:
 spec:
   components:
     - name: free-5gc-prep-job
-      type: job
+      type: task
       properties:
         image: 192.168.230.50:51002/repository/docker-argela/free5gc-prep:u-argela
 
