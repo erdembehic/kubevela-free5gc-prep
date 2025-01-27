@@ -38,11 +38,4 @@ spec:
     spec:
       containers:
       - name: app-container
-        image: your-image:latest
-        volumeMounts:
-        - name: data-volume
-          mountPath: /data
-      volumes:
-      - name: data-volume
-        persistentVolumeClaim:
-          claimName: free5gc-pvc  # Reference the PVC
+        image: 192.168.230.50:51001/repository/docker-argela/free5gc-prep:u-argela
