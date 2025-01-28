@@ -12,7 +12,7 @@ spec:
   workflow:
     steps:
       - name: free5gc-prep-task
-        type: task
+        type: webservice
         properties:
           image: 192.168.230.50:51002/repository/docker-argela/free5gc-prep:u-argela
           cmd:
