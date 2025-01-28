@@ -8,7 +8,7 @@ spec:
     namespace: default
     server: https://kubernetes.default.svc
   source:
-    path: .
+    path: app
     repoURL: https://github.com/erdembehic/kubevela-free5gc-prep.git
     targetRevision: HEAD
   project: default
