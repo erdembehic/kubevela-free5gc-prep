@@ -1,14 +1,16 @@
-# 1. PersistentVolume
 apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: example-local-pv9
+  labels:
+    project: free5gc
 spec:
   capacity:
     storage: 8Gi
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
+  volumeMode: Filesystem
   local:
     path: /root/kubedata
   nodeAffinity:
@@ -18,24 +20,20 @@ spec:
             - key: kubernetes.io/hostname
               operator: In
               values:
-                - cldauto-worker01
+                - cldauto-worker01  # Ensure this matches the exact node name from `kubectl get nodes`
+
 ---
-# 3. Deployment
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: batch/v1
+kind: Job
 metadata:
-  name: free5gc-deployment
+  name: free5gc-prep-job
   namespace: default
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: free5gc
+  backoffLimit: 2
   template:
-    metadata:
-      labels:
-        app: free5gc
     spec:
       containers:
-      - name: app-container
+      - name: ansible-job
         image: 192.168.230.50:51001/repository/docker-argela/free5gc-prep:u-argela
+        command: ["/bin/bash", "-c", "/playbooks/run_playbooks.sh ; sleep 10"]
+      restartPolicy: Never
