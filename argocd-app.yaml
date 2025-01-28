@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: free5gc-prep
+  namespace: argocd
+spec:
+  destination:
+    namespace: default
+    server: https://kubernetes.default.svc
+  source:
+    path: app
+    repoURL: https://github.com/erdembehic/kubevela-free5gc-prep.git
+    targetRevision: kubevela-prep-task
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

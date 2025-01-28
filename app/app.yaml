@@ -1,0 +1,41 @@
+# 1. PersistentVolume
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: example-local-pv9
+spec:
+  capacity:
+    storage: 8Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  local:
+    path: /root/kubedata
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - cldauto-worker01
+---
+# 3. Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: free5gc-deployment
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: free5gc
+  template:
+    metadata:
+      labels:
+        app: free5gc
+    spec:
+      containers:
+      - name: app-container
+        image: 192.168.230.50:51001/repository/docker-argela/free5gc-prep:u-argela

@@ -1,0 +1,10 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: free5gc-prep
+spec:
+  components:
+    - name: free5gc-prep-service
+      type: webservice
+      properties:
+        image: 192.168.230.50:51002/repository/docker-argela/free5gc-prep:u-argela
